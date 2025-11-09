@@ -1,0 +1,124 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payment-card-type-enum
+      author: Sergei Roik
+      changes:
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            sql: CREATE TYPE PAYMENT_CARD_TYPE AS ENUM ('ACTIVE', 'FROZEN', 'DELETED');
+      rollback:
+        - sql:
+            stripComments: false
+            sql: DROP TYPE IF EXISTS PAYMENT_CARD_TYPE;
+  - changeSet:
+      id: payment_card_create_sequence
+      author: Sergei Roik
+      changes:
+        - createSequence:
+            sequenceName: payment_card_number_seq
+            startValue: 1000000000000000
+            incrementBy: 1
+      rollback:
+        - dropSequence:
+            sequenceName: payment_card_number_seq
+  - changeSet:
+      id: table_payment_card
+      author: Sergei Roik
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: payment_card
+      changes:
+        - createTable:
+            tableName: payment_card
+            remarks: "Профиль клиента"
+            columns:
+              - column:
+                  name: id
+                  remarks: "Идентификатор карты"
+                  type: uuid
+                  defaultValue: "gen_random_uuid()"
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  remarks: "Идентификатор клиента"
+                  type: uuid
+              - column:
+                  name: number
+                  remarks: "Номер карты"
+                  type: bigint
+                  defaultValueComputed: "nextval('payment_card_number_seq')"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: holder
+                  remarks: "Держатель карты"
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expiration_date
+                  remarks: "Срок действия"
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP + interval '3 years'"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  remarks: "Статус карты"
+                  type: PAYMENT_CARD_TYPE
+                  defaultValue: 'ACTIVE'
+      rollback:
+        - dropTable:
+            tableName: payment_card
+  - changeSet:
+      id: constraint-add-fkey-client-id
+      author: Sergei Roik
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: payment_card
+            constraintName: user_id_fkey
+            referencedTableName: users
+            referencedColumnNames: id
+  - changeSet:
+      id: constraint-check-to-number
+      author: Sergei Roik
+      changes:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/constraints/add/ddl-add-constraint-check-to-number.sql
+      rollback:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/constraints/drop/ddl-drop-constraint-check-to-number.sql
+  - changeSet:
+      id: payment-cards-add-holder-function
+      author: Sergei Roik
+      changes:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/triggers/add/ddl-add-payment-card-holder-function.sql
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/triggers/drop/ddl-drop-payment-card-holder-function.sql
+            splitStatements: false
+  - changeSet:
+      id: payment-cards-add-holder-trigger
+      author: Sergei Roik
+      changes:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/triggers/add/ddl-add-payment-card-holder-trigger.sql
+      rollback:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/triggers/drop/ddl-drop-payment-card-holder-trigger.sql
+  - changeSet:
+      id: payment-cards-add-indexes
+      author: Sergei Roik
+      changes:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/indexes/add/ddl-add-indexes-to-payment-cards.sql
+      rollback:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/indexes/drop/ddl-drop-indexes-from-payment-cards.sql

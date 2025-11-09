@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS set_payment_card_holder();
