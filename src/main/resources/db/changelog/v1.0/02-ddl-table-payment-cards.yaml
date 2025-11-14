@@ -39,7 +39,6 @@ databaseChangeLog:
                   name: id
                   remarks: "Идентификатор карты"
                   type: uuid
-                  defaultValue: "uuid_generate_v7()"
                   constraints:
                     primaryKey: true
               - column:
