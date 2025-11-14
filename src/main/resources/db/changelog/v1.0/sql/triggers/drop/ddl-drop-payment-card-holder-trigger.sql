@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS trg_set_holder_before_insert ON payment_card;

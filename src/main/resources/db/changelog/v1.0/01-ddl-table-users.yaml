@@ -1,0 +1,82 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user-type-enum
+      author: Sergei Roik
+      changes:
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            sql: CREATE TYPE USER_TYPE AS ENUM ('ACTIVE', 'FROZEN', 'DELETED');
+      rollback:
+        - sql:
+            stripComments: false
+            sql: DROP TYPE IF EXISTS USER_TYPE;
+  - changeSet:
+      id: table_users
+      author: Sergei Roik
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: users
+      changes:
+        - createTable:
+            tableName: users
+            remarks: "Профиль клиента"
+            columns:
+              - column:
+                  name: id
+                  remarks: "Идентификатор пользовательского профиля"
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  remarks: "Имя"
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  remarks: "Фамилия"
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: birth_date
+                  remarks: "Дата рождения"
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  remarks: "Электронная почта"
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  remarks: "Статус пользователя"
+                  type: USER_TYPE
+                  defaultValue: 'ACTIVE'
+      rollback:
+        - dropTable:
+            tableName: users
+  - changeSet:
+      id: constraint-check-to-email
+      author: Sergei Roik
+      changes:
+        - sqlFile:
+            path: ${CHANGELOG_BASE}/v1.0/sql/constraints/add/ddl-add-constraint-check-to-email.sql
+      rollback:
+        - sqlFile:
+            path: ${CHANGELOG_BASE}/v1.0/sql/constraints/drop/ddl-drop-constraint-check-to-email.sql
+  - changeSet:
+      id: users-add-indexes
+      author: Sergei Roik
+      changes:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/indexes/add/ddl-add-indexes-to-users.sql
+      rollback:
+        - sqlFile:
+            path: db/changelog/v1.0/sql/indexes/drop/ddl-drop-indexes-from-users.sql

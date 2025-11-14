@@ -1,0 +1,2 @@
+ALTER TABLE payment_card
+DROP CONSTRAINT validate_card_number;
