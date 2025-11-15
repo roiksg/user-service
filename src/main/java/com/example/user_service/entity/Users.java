@@ -1,6 +1,7 @@
 package com.example.user_service.entity;
 
 import com.example.user_service.entity.enums.UserType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,7 +47,7 @@ public class Users {
     @Column(nullable = false)
     private UserType active;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<PaymentCard> cards;
 
 }

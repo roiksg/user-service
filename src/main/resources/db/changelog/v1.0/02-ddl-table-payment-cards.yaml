@@ -83,6 +83,7 @@ databaseChangeLog:
             constraintName: user_id_fkey
             referencedTableName: users
             referencedColumnNames: id
+            onDelete: CASCADE
   - changeSet:
       id: constraint-check-to-number
       author: Sergei Roik
