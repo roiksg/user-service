@@ -15,6 +15,7 @@ public interface UserService {
     Page<UsersResponseDto> getAllUsers(String name, String surname, Pageable pageable);
     UsersResponseDto updateUser(UUID id, UsersUpdateRequest usersUpdateRequest);
     UsersResponseDto changeStatus(UUID id, UserType status);
+    void removeUser (UUID id);
 
 
 }

@@ -16,5 +16,6 @@ public interface PaymentCardService {
     List<PaymentCardResponseDto> getCardsByUserId(UUID userId);
     PaymentCardResponseDto updateCard(UUID id, PaymentCardUpdateRequest updated);
     PaymentCardResponseDto changeStatus(UUID id, PaymentCardType status);
+    void deleteCard(UUID id);
 
 }

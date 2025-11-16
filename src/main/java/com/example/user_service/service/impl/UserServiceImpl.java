@@ -1,17 +1,17 @@
 package com.example.user_service.service.impl;
 
+import static com.example.user_service.util.ExceptionMessage.USER_NOT_FOUND_BY_ID;
+
 import com.example.user_service.dto.UsersCreateRequest;
 import com.example.user_service.dto.UsersResponseDto;
 import com.example.user_service.dto.UsersUpdateRequest;
 import com.example.user_service.entity.Users;
 import com.example.user_service.entity.enums.UserType;
+import com.example.user_service.exception.NotFoundException;
 import com.example.user_service.mapper.UsersMapper;
-import com.example.user_service.repository.PaymentCardRepository;
 import com.example.user_service.repository.UsersRepository;
 import com.example.user_service.service.UserService;
 import com.example.user_service.util.specification.UsersSpecification;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,24 +26,21 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UsersRepository usersRepository;
-    private final PaymentCardRepository paymentCardRepository;
     private final UsersMapper usersMapper;
 
     // Create User
     @Override
     public UsersResponseDto createUser(UsersCreateRequest user) {
         Users userEntity = usersMapper.toEntity(user);
-        UsersResponseDto responseDto = usersMapper.toDto(usersRepository.save(userEntity));
-        return responseDto;
+        return usersMapper.toDto(usersRepository.save(userEntity));
     }
 
     // Get User by ID
     @Override
     public UsersResponseDto getUser(UUID id) {
         Users users = usersRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("User not found: " + id));
-        UsersResponseDto usersResponseDto = usersMapper.toDto(users);
-        return usersResponseDto;
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
+        return usersMapper.toDto(users);
     }
 
     // Get All Users (paginated + filtered)
@@ -61,23 +58,28 @@ public class UserServiceImpl implements UserService {
     // Update User
     @Override
     public UsersResponseDto updateUser(UUID id, UsersUpdateRequest usersUpdateRequest) {
-        Optional<Users> usersOptional = usersRepository.findById(id);
-        Users users = usersOptional.get();
+        Users users = usersRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
 
         usersMapper.updateEntity(users, usersUpdateRequest);
         usersRepository.save(users);
-        UsersResponseDto usersResponseDto = usersMapper.toDto(users);
 
-        return usersResponseDto;
+        return usersMapper.toDto(users);
     }
 
     // Activate/Deactivate User
     @Override
     public UsersResponseDto changeStatus(UUID id, UserType status) {
-        Optional<Users> userOptional = usersRepository.findById(id);
-        Users user = userOptional.get();
+        Users user = usersRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
         user.setActive(status);
-        UsersResponseDto usersResponseDto = usersMapper.toDto(user);
-        return usersResponseDto;
+        return usersMapper.toDto(user);
+    }
+
+    @Override
+    public void removeUser (UUID id) {
+        Users user = usersRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
+        usersRepository.delete(user);
     }
 }

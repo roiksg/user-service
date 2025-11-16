@@ -1,18 +1,21 @@
 package com.example.user_service.service.impl;
 
+import static com.example.user_service.util.ExceptionMessage.CARD_LIMIT;
+import static com.example.user_service.util.ExceptionMessage.CARD_NOT_FOUND_BY_ID;
+
 import com.example.user_service.dto.PaymentCardResponseDto;
 import com.example.user_service.dto.PaymentCardUpdateRequest;
 import com.example.user_service.entity.PaymentCard;
 import com.example.user_service.entity.Users;
 import com.example.user_service.entity.enums.PaymentCardType;
+import com.example.user_service.exception.ConflictException;
+import com.example.user_service.exception.NotFoundException;
 import com.example.user_service.mapper.PaymentCardMapper;
 import com.example.user_service.repository.PaymentCardRepository;
 import com.example.user_service.repository.UsersRepository;
 import com.example.user_service.service.PaymentCardService;
 import com.example.user_service.util.specification.PaymentCardSpecification;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +37,13 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     public PaymentCardResponseDto createCard(UUID userId) {
 
         Users user = usersRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("User not found"));
+            .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
 
         long count = paymentCardRepository.count(
             PaymentCardSpecification.byUserId(userId));
 
         if (count >= 5) {
-            throw new IllegalStateException("User may have no more than 5 cards.");
+            throw new ConflictException(CARD_LIMIT.getDescription());
         }
         PaymentCard card = new PaymentCard();
         card.setUser(user);
@@ -52,7 +55,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     @Override
     public PaymentCardResponseDto getCard(UUID id) {
         PaymentCard card = paymentCardRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Card not found: " + id));
+            .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
         return paymentCardMapper.toDto(card);
     }
 
@@ -76,8 +79,8 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     // Update card
     @Override
     public PaymentCardResponseDto updateCard(UUID id, PaymentCardUpdateRequest updated) {
-        Optional<PaymentCard> paymentCardOptional = paymentCardRepository.findById(id);
-        PaymentCard card = paymentCardOptional.get();
+        PaymentCard card = paymentCardRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
 
         paymentCardMapper.updateEntity(card, updated);
         paymentCardRepository.save(card);
@@ -88,10 +91,17 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     // Activate/Deactivate card
     @Override
     public PaymentCardResponseDto changeStatus(UUID id, PaymentCardType status) {
-        Optional<PaymentCard> cardOptional = paymentCardRepository.findById(id);
-        PaymentCard card = cardOptional.get();
+        PaymentCard card = paymentCardRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
         card.setActive(status);
         paymentCardRepository.save(card);
         return paymentCardMapper.toDto(card);
+    }
+
+    @Override
+    public void deleteCard(UUID id) {
+        PaymentCard card = paymentCardRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
+        paymentCardRepository.delete(card);
     }
 }
