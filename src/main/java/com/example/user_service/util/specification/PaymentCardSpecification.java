@@ -10,4 +10,11 @@ public class PaymentCardSpecification {
             userId == null ? null : cb.equal(root.get("user").get("id"), userId);
     }
 
+    public static Specification<PaymentCard> numberContains(String number) {
+        return (root, query, cb) ->
+            (number == null || number.isBlank())
+                ? null
+                : cb.like(cb.lower(root.get("number")), "%" + number.toLowerCase() + "%");
+    }
+
 }
