@@ -6,7 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record UsersResponseDto(
     @NotBlank
     UUID id,

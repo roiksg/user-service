@@ -19,7 +19,7 @@ public interface UsersMapper {
     List<UsersResponseDto> toDtoList(List<Users> entities);
 
     @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "active", constant = "ACTIVE")
+    @Mapping(target = "active", ignore = true)
     Users toEntity(UsersCreateRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

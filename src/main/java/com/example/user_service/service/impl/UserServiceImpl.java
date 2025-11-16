@@ -15,6 +15,9 @@ import com.example.user_service.util.specification.UsersSpecification;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,6 +33,7 @@ public class UserServiceImpl implements UserService {
 
     // Create User
     @Override
+    @CachePut(value = "users", key = "#result.id")
     public UsersResponseDto createUser(UsersCreateRequest user) {
         Users userEntity = usersMapper.toEntity(user);
         return usersMapper.toDto(usersRepository.save(userEntity));
@@ -37,6 +41,7 @@ public class UserServiceImpl implements UserService {
 
     // Get User by ID
     @Override
+    @Cacheable(value = "users", key = "#id")
     public UsersResponseDto getUser(UUID id) {
         Users users = usersRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
@@ -57,6 +62,7 @@ public class UserServiceImpl implements UserService {
 
     // Update User
     @Override
+    @CachePut(value = "users", key = "#id")
     public UsersResponseDto updateUser(UUID id, UsersUpdateRequest usersUpdateRequest) {
         Users users = usersRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
@@ -69,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
     // Activate/Deactivate User
     @Override
+    @CachePut(value = "users", key = "#id")
     public UsersResponseDto changeStatus(UUID id, UserType status) {
         Users user = usersRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
@@ -77,6 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "users", key = "#id")
     public void removeUser (UUID id) {
         Users user = usersRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));

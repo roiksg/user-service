@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +20,6 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -34,20 +32,16 @@ public class PaymentCard {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    @Column(nullable = false)
     private Long number;
 
-    @Column(nullable = false, length = 50)
     private String holder;
 
-    @Column(name = "expiration_date", nullable = false)
     private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentCardType active;
-
 }

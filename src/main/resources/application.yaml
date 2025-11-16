@@ -3,6 +3,8 @@ server:
 spring:
   application:
     name: ${APPLICATION_NAME}
+  cache:
+    type: redis
   datasource:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
@@ -19,3 +21,8 @@ spring:
   liquibase:
     change-log: classpath:${CHANGELOG_BASE}/${CHANGELOG_FILE_NAME}
     enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000

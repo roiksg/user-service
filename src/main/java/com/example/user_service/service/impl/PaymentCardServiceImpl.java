@@ -3,6 +3,7 @@ package com.example.user_service.service.impl;
 import static com.example.user_service.util.ExceptionMessage.CARD_LIMIT;
 import static com.example.user_service.util.ExceptionMessage.CARD_NOT_FOUND_BY_ID;
 
+import com.example.user_service.dto.PaymentCardCreateRequest;
 import com.example.user_service.dto.PaymentCardResponseDto;
 import com.example.user_service.dto.PaymentCardUpdateRequest;
 import com.example.user_service.entity.PaymentCard;
@@ -15,6 +16,7 @@ import com.example.user_service.repository.PaymentCardRepository;
 import com.example.user_service.repository.UsersRepository;
 import com.example.user_service.service.PaymentCardService;
 import com.example.user_service.util.specification.PaymentCardSpecification;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +47,12 @@ public class PaymentCardServiceImpl implements PaymentCardService {
         if (count >= 5) {
             throw new ConflictException(CARD_LIMIT.getDescription());
         }
-        PaymentCard card = new PaymentCard();
-        card.setUser(user);
-        paymentCardRepository.save(card);
-        return paymentCardMapper.toDto(card);
+        PaymentCardCreateRequest request = new PaymentCardCreateRequest(userId);
+        PaymentCard card = paymentCardMapper.toEntity(request, user);
+        card.setNumber(generateCardNumber());
+        card.setExpirationDate(LocalDateTime.now().plusYears(3));
+        PaymentCard savedCard = paymentCardRepository.save(card);
+        return paymentCardMapper.toDto(savedCard);
     }
 
     // Get Card by ID
@@ -103,5 +107,9 @@ public class PaymentCardServiceImpl implements PaymentCardService {
         PaymentCard card = paymentCardRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
         paymentCardRepository.delete(card);
+    }
+
+    private Long generateCardNumber() {
+        return 4000_0000_0000_0000L + (long) (Math.random() * 1_0000_0000_0000_0000L);
     }
 }
