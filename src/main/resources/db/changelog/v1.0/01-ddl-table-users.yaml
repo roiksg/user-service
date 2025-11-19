@@ -45,7 +45,7 @@ databaseChangeLog:
               - column:
                   name: birth_date
                   remarks: "Дата рождения"
-                  type: timestamp
+                  type: date
                   constraints:
                     nullable: false
               - column:

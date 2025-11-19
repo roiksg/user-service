@@ -12,17 +12,6 @@ databaseChangeLog:
             stripComments: false
             sql: DROP TYPE IF EXISTS PAYMENT_CARD_TYPE;
   - changeSet:
-      id: payment_card_create_sequence
-      author: Sergei Roik
-      changes:
-        - createSequence:
-            sequenceName: payment_card_number_seq
-            startValue: 1000000000000000
-            incrementBy: 1
-      rollback:
-        - dropSequence:
-            sequenceName: payment_card_number_seq
-  - changeSet:
       id: table_payment_card
       author: Sergei Roik
       preConditions:
@@ -47,11 +36,12 @@ databaseChangeLog:
                   type: uuid
               - column:
                   name: number
-                  remarks: "Номер карты"
-                  type: bigint
-                  defaultValueComputed: "nextval('payment_card_number_seq')"
+                  remarks: "Номер карты (16 цифр)"
+                  type: varchar(19)
+                  defaultValueComputed: "lpad(cast(4000000000000000 + floor(random() * 1000000000000000)::bigint as text), 16, '0')"
                   constraints:
                     nullable: false
+                    unique: true
               - column:
                   name: holder
                   remarks: "Держатель карты"
@@ -61,8 +51,8 @@ databaseChangeLog:
               - column:
                   name: expiration_date
                   remarks: "Срок действия"
-                  type: timestamp
-                  defaultValueComputed: "CURRENT_TIMESTAMP + interval '3 years'"
+                  type: date
+                  defaultValueComputed: "CURRENT_DATE + interval '3 years'"
                   constraints:
                     nullable: false
               - column:

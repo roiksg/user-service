@@ -12,16 +12,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -40,17 +44,17 @@ public class Users implements Serializable {
     private String surname;
 
     @Column(name = "birth_date", nullable = false)
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column(nullable = false, length = 50)
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserType active;
+    @Column(nullable = false, columnDefinition = "USER_TYPE")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private UserType active = UserType.ACTIVE;;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore
     private List<PaymentCard> cards;
-
 }

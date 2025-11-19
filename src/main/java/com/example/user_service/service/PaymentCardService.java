@@ -12,7 +12,7 @@ public interface PaymentCardService {
 
     PaymentCardResponseDto createCard(UUID userId);
     PaymentCardResponseDto getCard(UUID id);
-    Page<PaymentCardResponseDto> getAllCards(Long number, Pageable pageable);
+    Page<PaymentCardResponseDto> getAllCards(String number, Pageable pageable);
     List<PaymentCardResponseDto> getCardsByUserId(UUID userId);
     PaymentCardResponseDto updateCard(UUID id, PaymentCardUpdateRequest updated);
     PaymentCardResponseDto changeStatus(UUID id, PaymentCardType status);

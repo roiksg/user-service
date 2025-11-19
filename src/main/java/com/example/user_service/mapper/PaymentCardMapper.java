@@ -8,7 +8,6 @@ import com.example.user_service.entity.Users;
 import com.example.user_service.entity.enums.PaymentCardType;
 import java.util.List;
 import org.mapstruct.BeanMapping;
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -29,8 +28,8 @@ public interface PaymentCardMapper {
     @Mapping(target = "expirationDate", ignore = true)
     @Mapping(target = "holder", ignore = true)
     @Mapping(target = "active", constant = "ACTIVE")
-    @Mapping(target = "user", source = ".")
-    PaymentCard toEntity(PaymentCardCreateRequest request, @Context Users user);
+    @Mapping(target = "user", source = "user")
+    PaymentCard toEntity(PaymentCardCreateRequest request, Users user);
 
     // updateEntity: UpdateRequest → Entity (partial update)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -49,7 +48,7 @@ public interface PaymentCardMapper {
         try {
             return PaymentCardType.valueOf(active.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null; // или бросить ошибку
+            return null;
         }
     }
 

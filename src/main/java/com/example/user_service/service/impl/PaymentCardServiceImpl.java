@@ -16,7 +16,7 @@ import com.example.user_service.repository.PaymentCardRepository;
 import com.example.user_service.repository.UsersRepository;
 import com.example.user_service.service.PaymentCardService;
 import com.example.user_service.util.specification.PaymentCardSpecification;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
         PaymentCardCreateRequest request = new PaymentCardCreateRequest(userId);
         PaymentCard card = paymentCardMapper.toEntity(request, user);
         card.setNumber(generateCardNumber());
-        card.setExpirationDate(LocalDateTime.now().plusYears(3));
+        card.setExpirationDate(LocalDate.now().plusYears(3));
         PaymentCard savedCard = paymentCardRepository.save(card);
         return paymentCardMapper.toDto(savedCard);
     }
@@ -65,8 +65,8 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     // Get all cards with pagination
     @Override
-    public Page<PaymentCardResponseDto> getAllCards(Long number, Pageable pageable) {
-        Specification<PaymentCard> spec = PaymentCardSpecification.numberContains(number.toString());
+    public Page<PaymentCardResponseDto> getAllCards(String number, Pageable pageable) {
+        Specification<PaymentCard> spec = PaymentCardSpecification.numberContains(number);
         Page<PaymentCard> paymentCards = paymentCardRepository.findAll(spec, pageable);
 
         return paymentCards.map(paymentCardMapper::toDto);
@@ -109,7 +109,8 @@ public class PaymentCardServiceImpl implements PaymentCardService {
         paymentCardRepository.delete(card);
     }
 
-    private Long generateCardNumber() {
-        return 4000_0000_0000_0000L + (long) (Math.random() * 1_0000_0000_0000_0000L);
+    private String generateCardNumber() {
+        long num = 4000_0000_0000_0000L + (long) (Math.random() * 1_000_000_000_000_000L);
+        return String.valueOf(num);
     }
 }

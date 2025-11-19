@@ -10,16 +10,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -35,13 +39,15 @@ public class PaymentCard {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    private Long number;
+    @Column(name = "number", nullable = false, unique = true, length = 16)
+    private String number;
 
     private String holder;
 
-    private LocalDateTime expirationDate;
+    private LocalDate expirationDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentCardType active;
+    @Column(nullable = false, columnDefinition = "PAYMENT_CARD_TYPE")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private PaymentCardType active = PaymentCardType.ACTIVE;
 }

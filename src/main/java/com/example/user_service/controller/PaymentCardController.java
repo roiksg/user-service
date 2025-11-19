@@ -43,7 +43,7 @@ public class PaymentCardController {
     @GetMapping("/list-card")
     @ResponseStatus (HttpStatus.OK)
     public Page<PaymentCardResponseDto> getAllCards(
-        @RequestParam(required = false) Long number,
+        @RequestParam(required = false) String number,
         @PageableDefault(size = 20, sort = "number") Pageable pageable) {
         return paymentCardService.getAllCards(number, pageable);
     }
@@ -71,5 +71,4 @@ public class PaymentCardController {
     public void deleteCard(@RequestHeader UUID id) {
         paymentCardService.deleteCard(id);
     }
-
 }

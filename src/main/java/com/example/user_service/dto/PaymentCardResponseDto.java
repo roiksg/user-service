@@ -1,23 +1,34 @@
 package com.example.user_service.dto;
 
+import com.example.user_service.entity.enums.PaymentCardType;
 import com.example.user_service.util.validation.annotation.CheckCardNumber;
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record PaymentCardResponseDto(
-
-    @NotBlank
-    UUID id,
-    @NotBlank
-    UUID userId,
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class PaymentCardResponseDto{
+    @NotNull
+    UUID id;
+    @NotNull
+    UUID userId;
     @NotBlank
     @CheckCardNumber
-    Long number,
+    String number;
     @NotBlank
-    String holder,
-    @NotBlank
-    LocalDateTime expirationDate,
-    @NotBlank
-    String active
-) {}
+    String holder;
+    @NotNull
+    LocalDate expirationDate;
+    @NotNull
+    PaymentCardType active;
+}
