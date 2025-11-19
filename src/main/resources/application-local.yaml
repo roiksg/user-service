@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/myuser
+    username: admin
+    password: admin
+
+  data:
+    redis:
+      host: localhost   # Redis тоже локальный
+
+# Локально удобно видеть больше логов
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
