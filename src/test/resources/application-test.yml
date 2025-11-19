@@ -2,12 +2,10 @@ spring:
   application:
     name: user-service-test
 
-  # Всё остальное можно оставить как у тебя было
   datasource:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    driver-class-name: org.postgresql.Driver
 
   liquibase:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     change-log: classpath:db/changelog/db.changelog-master.yaml
     contexts: test
     parameters:

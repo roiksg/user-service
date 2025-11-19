@@ -14,8 +14,8 @@ public class SharedPostgresContainer {
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
         .withDatabaseName("myuser_test_db")
         .withUsername("test")
-        .withPassword("test")
-        .withReuse(true);
+        .withPassword("test");
+        //.withReuse(true);
 
     static {
         postgres.start();
