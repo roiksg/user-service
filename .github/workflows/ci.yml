@@ -13,8 +13,13 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build & test
-        run: ./mvnw clean verify -B
+      - name: Build project
+        run: mvn clean compile
+
+
+
+      - name: Run test
+        run: mvn test
 
       - name: Upload reports
         if: always()
