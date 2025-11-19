@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://user_db:5432/myuser
+    username: admin
+    password: admin
+
+  data:
+    redis:
+      host: redis_container
+
+server:
+  port: 8092
+
+logging:
+  level:
+    org.hibernate.SQL: info
