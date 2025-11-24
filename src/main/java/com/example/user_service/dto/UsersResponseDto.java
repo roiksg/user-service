@@ -5,6 +5,7 @@ import com.example.user_service.util.validation.RegExp;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UsersResponseDto {
+public class UsersResponseDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @NotNull
     UUID id;
     @NotBlank

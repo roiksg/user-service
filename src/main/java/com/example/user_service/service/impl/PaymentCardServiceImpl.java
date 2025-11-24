@@ -3,12 +3,12 @@ package com.example.user_service.service.impl;
 import static com.example.user_service.util.ExceptionMessage.CARD_LIMIT;
 import static com.example.user_service.util.ExceptionMessage.CARD_NOT_FOUND_BY_ID;
 
+import com.example.user_service.dto.ChangePaymentCardTypeRequest;
 import com.example.user_service.dto.PaymentCardCreateRequest;
 import com.example.user_service.dto.PaymentCardResponseDto;
 import com.example.user_service.dto.PaymentCardUpdateRequest;
 import com.example.user_service.entity.PaymentCard;
 import com.example.user_service.entity.Users;
-import com.example.user_service.entity.enums.PaymentCardType;
 import com.example.user_service.exception.ConflictException;
 import com.example.user_service.exception.NotFoundException;
 import com.example.user_service.mapper.PaymentCardMapper;
@@ -98,10 +98,10 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     // Activate/Deactivate card
     @Override
     @Transactional
-    public PaymentCardResponseDto changeStatus(UUID id, PaymentCardType status) {
+    public PaymentCardResponseDto changeStatus(UUID id, ChangePaymentCardTypeRequest status) {
         PaymentCard card = paymentCardRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
-        card.setActive(status);
+        card.setActive(status.getStatus());
         paymentCardRepository.save(card);
         return paymentCardMapper.toDto(card);
     }

@@ -2,6 +2,7 @@ package com.example.user_service.controller;
 
 import com.example.user_service.IntegrationTest;
 import com.example.user_service.SharedPostgresContainer;
+import com.example.user_service.dto.ChangeUserStatusRequest;
 import com.example.user_service.dto.UsersCreateRequest;
 import com.example.user_service.dto.UsersResponseDto;
 import com.example.user_service.dto.UsersUpdateRequest;
@@ -116,10 +117,12 @@ class UserControllerIT extends IntegrationTest {
 
     @Test
     void changeStatus_ToFrozen_ShouldChangeStatus() {
+        ChangeUserStatusRequest status = ChangeUserStatusRequest.builder().status(UserType.FROZEN).build();
+
         webTestClient.post()
             .uri("/auth/user/change-user-status")
             .header("id", USER_WITH_0_CARDS.toString())
-            .bodyValue(UserType.FROZEN)
+            .bodyValue(status)
             .exchange()
             .expectStatus().isOk()
             .expectBody(UsersResponseDto.class)
@@ -128,18 +131,21 @@ class UserControllerIT extends IntegrationTest {
 
     @Test
     void changeStatus_ToActive_ShouldChangeBack() {
+        ChangeUserStatusRequest statusFrozen = ChangeUserStatusRequest.builder().status(UserType.FROZEN).build();
+        ChangeUserStatusRequest statusActive = ChangeUserStatusRequest.builder().status(UserType.ACTIVE).build();
+
         // Сначала заморозим
         webTestClient.post()
             .uri("/auth/user/change-user-status")
             .header("id", USER_WITH_0_CARDS.toString())
-            .bodyValue(UserType.FROZEN)
+            .bodyValue(statusFrozen)
             .exchange();
 
         // Потом разморозим
         webTestClient.post()
             .uri("/auth/user/change-user-status")
             .header("id", USER_WITH_0_CARDS.toString())
-            .bodyValue(UserType.ACTIVE)
+            .bodyValue(statusActive)
             .exchange()
             .expectStatus().isOk()
             .expectBody(UsersResponseDto.class)
@@ -167,7 +173,7 @@ class UserControllerIT extends IntegrationTest {
             .uri("/auth/user/remove-user")
             .header("id", tempId.toString())
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isNoContent();
 
         // Проверяем, что больше не находится
         webTestClient.post()

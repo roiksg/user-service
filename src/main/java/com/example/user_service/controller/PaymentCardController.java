@@ -1,8 +1,8 @@
 package com.example.user_service.controller;
 
+import com.example.user_service.dto.ChangePaymentCardTypeRequest;
 import com.example.user_service.dto.PaymentCardResponseDto;
 import com.example.user_service.dto.PaymentCardUpdateRequest;
-import com.example.user_service.entity.enums.PaymentCardType;
 import com.example.user_service.service.PaymentCardService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -62,7 +62,7 @@ public class PaymentCardController {
 
     @PostMapping("/change-card-status")
     @ResponseStatus (HttpStatus.OK)
-    public PaymentCardResponseDto changeStatus(@RequestHeader UUID id, @RequestBody PaymentCardType status) {
+    public PaymentCardResponseDto changeStatus(@RequestHeader UUID id, @RequestBody ChangePaymentCardTypeRequest status) {
         return paymentCardService.changeStatus(id, status);
     }
 

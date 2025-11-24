@@ -1,6 +1,7 @@
 package com.example.user_service.dto;
 
 import com.example.user_service.util.validation.RegExp;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -25,6 +26,7 @@ public class UsersCreateRequest{
     @NotBlank
     String surname;
     @NotNull
+    @JsonFormat(pattern = "dd.MM.yyyy")
     LocalDate birthDate;
     @NotBlank (message = "email не иожет быть пустым")
     @Pattern(message = "Некорректный email", regexp = RegExp.EMAIL_REG)

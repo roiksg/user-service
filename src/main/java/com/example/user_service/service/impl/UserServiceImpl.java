@@ -2,11 +2,11 @@ package com.example.user_service.service.impl;
 
 import static com.example.user_service.util.ExceptionMessage.USER_NOT_FOUND_BY_ID;
 
+import com.example.user_service.dto.ChangeUserStatusRequest;
 import com.example.user_service.dto.UsersCreateRequest;
 import com.example.user_service.dto.UsersResponseDto;
 import com.example.user_service.dto.UsersUpdateRequest;
 import com.example.user_service.entity.Users;
-import com.example.user_service.entity.enums.UserType;
 import com.example.user_service.exception.NotFoundException;
 import com.example.user_service.mapper.UsersMapper;
 import com.example.user_service.repository.UsersRepository;
@@ -80,10 +80,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @CachePut(value = "users", key = "#id")
     @Transactional
-    public UsersResponseDto changeStatus(UUID id, UserType status) {
+    public UsersResponseDto changeStatus(UUID id, ChangeUserStatusRequest status) {
         Users user = usersRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_BY_ID.getDescription()));
-        user.setActive(status);
+        user.setActive(status.getStatus());
         return usersMapper.toDto(user);
     }
 

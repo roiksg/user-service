@@ -2,6 +2,7 @@ package com.example.user_service.controller;
 
 import com.example.user_service.IntegrationTest;
 import com.example.user_service.SharedPostgresContainer;
+import com.example.user_service.dto.ChangePaymentCardTypeRequest;
 import com.example.user_service.dto.PaymentCardResponseDto;
 import com.example.user_service.dto.PaymentCardUpdateRequest;
 import com.example.user_service.entity.enums.PaymentCardType;
@@ -200,11 +201,13 @@ public class PaymentCardControllerIT extends IntegrationTest {
     @Test
     void changeStatus_ShouldChangeStatusOnly() {
         UUID cardId = UUID.fromString("a0000000-0000-0000-0000-000000000007");
+        ChangePaymentCardTypeRequest statusFrozen = ChangePaymentCardTypeRequest.builder().status(PaymentCardType.FROZEN).build();
+        ChangePaymentCardTypeRequest statusActiv = ChangePaymentCardTypeRequest.builder().status(PaymentCardType.ACTIVE).build();
 
         webTestClient.post()
             .uri("/auth/payment-card/change-card-status")
             .header("id", cardId.toString())
-            .bodyValue(PaymentCardType.FROZEN)
+            .bodyValue(statusFrozen)
             .exchange()
             .expectStatus().isOk()
             .expectBody(PaymentCardResponseDto.class)
@@ -214,7 +217,7 @@ public class PaymentCardControllerIT extends IntegrationTest {
         webTestClient.post()
             .uri("/auth/payment-card/change-card-status")
             .header("id", cardId.toString())
-            .bodyValue(PaymentCardType.ACTIVE)
+            .bodyValue(statusActiv)
             .exchange()
             .expectStatus().isOk()
             .expectBody(PaymentCardResponseDto.class)
@@ -240,7 +243,7 @@ public class PaymentCardControllerIT extends IntegrationTest {
             .uri("/auth/payment-card/remove-card")
             .header("id", tempId.toString())
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isNoContent();
 
         // проверяем, что больше не находится
         webTestClient.get()

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.user_service.dto.ChangePaymentCardTypeRequest;
 import com.example.user_service.dto.PaymentCardCreateRequest;
 import com.example.user_service.dto.PaymentCardResponseDto;
 import com.example.user_service.dto.PaymentCardUpdateRequest;
@@ -239,12 +240,13 @@ class PaymentCardServiceImplTest {
     @Test
     void changeStatus_WhenExists_ChangesStatus() {
         var frozenDto = existingCardDto.toBuilder().active(PaymentCardType.FROZEN).build();
+        ChangePaymentCardTypeRequest status = ChangePaymentCardTypeRequest.builder().status(PaymentCardType.FROZEN).build();
 
         when(paymentCardRepository.findById(EXISTING_CARD_ID)).thenReturn(Optional.of(existingCard));
         when(paymentCardRepository.save(existingCard)).thenReturn(existingCard);
         when(paymentCardMapper.toDto(existingCard)).thenReturn(frozenDto);
 
-        PaymentCardResponseDto result = paymentCardService.changeStatus(EXISTING_CARD_ID, PaymentCardType.FROZEN);
+        PaymentCardResponseDto result = paymentCardService.changeStatus(EXISTING_CARD_ID, status);
 
         assertEquals(PaymentCardType.FROZEN, existingCard.getActive());
         assertEquals(PaymentCardType.FROZEN, result.getActive());
@@ -252,10 +254,11 @@ class PaymentCardServiceImplTest {
 
     @Test
     void changeStatus_WhenNotExists_ThrowsNotFoundException() {
+        ChangePaymentCardTypeRequest status = ChangePaymentCardTypeRequest.builder().status(PaymentCardType.FROZEN).build();
         when(paymentCardRepository.findById(NON_EXISTING_CARD_ID)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-            () -> paymentCardService.changeStatus(NON_EXISTING_CARD_ID, PaymentCardType.FROZEN));
+            () -> paymentCardService.changeStatus(NON_EXISTING_CARD_ID, status));
     }
 
     // ===================== DELETE CARD =====================

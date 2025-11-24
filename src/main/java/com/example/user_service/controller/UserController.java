@@ -1,9 +1,9 @@
 package com.example.user_service.controller;
 
+import com.example.user_service.dto.ChangeUserStatusRequest;
 import com.example.user_service.dto.UsersCreateRequest;
 import com.example.user_service.dto.UsersResponseDto;
 import com.example.user_service.dto.UsersUpdateRequest;
-import com.example.user_service.entity.enums.UserType;
 import com.example.user_service.service.UserService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -48,7 +48,7 @@ public class UserController {
 
     @PostMapping("/change-user-status")
     @ResponseStatus(HttpStatus.OK)
-    public UsersResponseDto changeStatus(@RequestHeader UUID id, @RequestBody @Valid UserType status) {
+    public UsersResponseDto changeStatus(@RequestHeader UUID id, @RequestBody @Valid ChangeUserStatusRequest status) {
         return userService.changeStatus(id, status);
     }
 

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.user_service.dto.ChangeUserStatusRequest;
 import com.example.user_service.dto.UsersCreateRequest;
 import com.example.user_service.dto.UsersResponseDto;
 import com.example.user_service.dto.UsersUpdateRequest;
@@ -196,11 +197,12 @@ class UserServiceImplTest {
         var frozenDto = existingUserDto.toBuilder()
             .active(UserType.FROZEN)
             .build();
+        ChangeUserStatusRequest statusRequest = ChangeUserStatusRequest.builder().status(UserType.FROZEN).build();
 
         when(usersRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existingUser));
         when(usersMapper.toDto(existingUser)).thenReturn(frozenDto);
 
-        UsersResponseDto result = userService.changeStatus(EXISTING_ID, UserType.FROZEN);
+        UsersResponseDto result = userService.changeStatus(EXISTING_ID, statusRequest);
 
         assertEquals(UserType.FROZEN, existingUser.getActive());
         assertEquals(UserType.FROZEN, result.getActive());
@@ -208,10 +210,11 @@ class UserServiceImplTest {
 
     @Test
     void changeStatus_WhenNotExists_ThrowsNotFoundException() {
+        ChangeUserStatusRequest statusRequest = ChangeUserStatusRequest.builder().status(UserType.FROZEN).build();
         when(usersRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-            () -> userService.changeStatus(NON_EXISTING_ID, UserType.FROZEN));
+            () -> userService.changeStatus(NON_EXISTING_ID, statusRequest));
     }
 
     // ===================== REMOVE USER =====================
