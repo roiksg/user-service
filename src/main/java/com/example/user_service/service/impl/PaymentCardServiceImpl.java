@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -36,6 +37,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     // Create Card
     @Override
+    @Transactional
     public PaymentCardResponseDto createCard(UUID userId) {
 
         Users user = usersRepository.findById(userId)
@@ -82,6 +84,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     // Update card
     @Override
+    @Transactional
     public PaymentCardResponseDto updateCard(UUID id, PaymentCardUpdateRequest updated) {
         PaymentCard card = paymentCardRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
@@ -94,6 +97,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     // Activate/Deactivate card
     @Override
+    @Transactional
     public PaymentCardResponseDto changeStatus(UUID id, PaymentCardType status) {
         PaymentCard card = paymentCardRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));
@@ -103,6 +107,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     }
 
     @Override
+    @Transactional
     public void deleteCard(UUID id) {
         PaymentCard card = paymentCardRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND_BY_ID.getDescription()));

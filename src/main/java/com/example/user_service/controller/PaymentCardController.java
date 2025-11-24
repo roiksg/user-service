@@ -67,7 +67,7 @@ public class PaymentCardController {
     }
 
     @PostMapping("/remove-card")
-    @ResponseStatus (HttpStatus.OK)
+    @ResponseStatus (HttpStatus.NO_CONTENT)
     public void deleteCard(@RequestHeader UUID id) {
         paymentCardService.deleteCard(id);
     }

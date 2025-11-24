@@ -1,11 +1,29 @@
-name: CI
-on: [push, pull_request]
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
 
 jobs:
-  test:
+  build-and-push:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository }}/user-service
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -13,17 +31,61 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build project
-        run: mvn clean compile
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
 
+      - name: Build with Maven (skip tests for speed, tests run separately)
+        run: ./mvnw -B clean package -DskipTests
 
+      - name: Run tests
+        run: ./mvnw -B test
 
-      - name: Run test
-        run: mvn test
-
-      - name: Upload reports
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: surefire-reports
           path: target/surefire-reports/
+          retention-days: 30
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: user-service-jar
+          path: target/*.jar
+          retention-days: 14
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+            ${{ env.IMAGE_NAME }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Image digest
+        run: |
+          echo "Image pushed:"
+          echo "${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}"
+          echo "${{ env.IMAGE_NAME }}:latest"

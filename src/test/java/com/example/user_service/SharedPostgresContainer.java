@@ -11,7 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class SharedPostgresContainer {
 
     @Container
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
         .withDatabaseName("myuser_test_db")
         .withUsername("test")
         .withPassword("test");
