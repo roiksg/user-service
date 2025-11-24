@@ -40,8 +40,8 @@ jobs:
             echo "version=latest" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build with Maven (skip tests for speed, tests run separately)
-        run: ./mvnw -B clean package -DskipTests
+      - name: Build with Maven
+        run: chmod +x mvnw && ./mvnw -B clean package -DskipTests
 
       - name: Run tests
         run: ./mvnw -B test
