@@ -3,3 +3,5 @@ databaseChangeLog:
     file: ${CHANGELOG_BASE}/v1.0/01-ddl-table-users.yaml
  - include:
      file: ${CHANGELOG_BASE}/v1.0/02-ddl-table-payment-cards.yaml
+ - include:
+     file: ${CHANGELOG_BASE}/data.sql
